@@ -1,0 +1,235 @@
+CREATE DATABASE QUANLYNHATHUOC
+USE QUANLYNHATHUOC
+GO
+CREATE TABLE NHACUNGCAP
+(
+MANCC VARCHAR(10) NOT NULL,
+TENNCC NVARCHAR(50),
+DIACHI NVARCHAR(80) DEFAULT NULL,
+DIENTHOAI NCHAR(11) UNIQUE,
+CONGNO MONEY DEFAULT 0,
+PRIMARY KEY(MANCC)
+);
+GO
+CREATE TABLE NHOMTHUOC
+(
+MANHOM VARCHAR(5) NOT NULL,
+TENNHOM NVARCHAR(20),
+SOLUONG INT DEFAULT 0,
+PRIMARY KEY(MANHOM)
+);
+Go
+CREATE TABLE THUOC
+(
+MATHUOC VARCHAR(10) NOT NULL,
+TENTHUOC NVARCHAR(30),
+MANHOM VARCHAR(5),
+THANHPHAN NVARCHAR(40) DEFAULT NULL,
+MANCC VARCHAR(10) ,
+GIASI MONEY DEFAULT 0,
+GIALE MONEY DEFAULT 0,
+GIANHAP MONEY DEFAULT 0,
+CONGDUNG NVARCHAR(100),
+PRIMARY KEY(MATHUOC),
+FOREIGN KEY(MANHOM) REFERENCES NHOMTHUOC(MANHOM),
+FOREIGN KEY(MANCC) REFERENCES NHACUNGCAP(MANCC),
+);
+
+
+CREATE TABLE NHANVIEN
+(
+MANV VARCHAR(10) NOT NULL,
+TENNV NVARCHAR(50),
+NGAYSINH DATE,
+VANBANG NVARCHAR(30) DEFAULT NULL,
+DIACHI NVARCHAR(80),
+PHAI NVARCHAR(3) CHECK(PHAI IN(N'Nam',N'Nữ')),
+VITRI NVARCHAR(15),
+BOPHAN NVARCHAR(40),
+PRIMARY KEY(MANV)
+);
+CREATE TABLE KHACHHANG
+(
+MAKH VARCHAR(10) NOT NULL,
+TENKHACH NVARCHAR(30),
+DIACHI NVARCHAR(80) DEFAULT NULL,
+DIENTHOAI NCHAR(11) UNIQUE,
+LOAIKH NVARCHAR(15),
+CONGNO MONEY DEFAULT 0,
+ PRIMARY KEY(MAKH)
+);
+CREATE TABLE DONHANGXUAT
+(
+MADONHANG VARCHAR(10) NOT NULL,
+MAKH VARCHAR(10) NOT NULL,
+MANV VARCHAR(10) NOT NULL,
+NGAYLAP DATE NOT NULL,
+TONGTIEN MONEY DEFAULT 0,
+DATHANHTOAN MONEY DEFAULT 0,
+CONGNO MONEY DEFAULT 0,
+PRIMARY KEY(MADONHANG),
+FOREIGN KEY(MAKH) REFERENCES KHACHHANG(MAKH),
+FOREIGN KEY(MANV) REFERENCES NHANVIEN(MANV)
+);
+CREATE TABLE DONHANGNHAP
+(
+ MADONHANG VARCHAR(10) NOT NULL,
+ MANCC VARCHAR(10) NOT NULL,
+ NGAYLAP DATE,
+ TONGTIEN MONEY DEFAULT 0,
+ DATHANHTOAN MONEY DEFAULT 0,
+ CONGNO MONEY DEFAULT 0,
+ MANV VARCHAR(10),
+ PRIMARY KEY(MADONHANG),
+ FOREIGN KEY(MANCC) REFERENCES NHACUNGCAP(MANCC),
+ FOREIGN KEY(MANV) REFERENCES NHANVIEN(MANV)
+);
+
+CREATE TABLE NHAPTHUOC
+(
+ MADONHANG VARCHAR(10) NOT NULL,
+ THUOC VARCHAR(10) NOT NULL,
+ SOLUONG INT DEFAULT 1,
+ DONVITINH NVARCHAR(20),
+ THANHTIEN MONEY,
+ NGAYSX DATE,
+ NGAYHETHAN DATE,
+ PRIMARY KEY(MADONHANG, THUOC),
+ FOREIGN KEY(MADONHANG) REFERENCES DONHANGNHAP(MADONHANG),
+ FOREIGN KEY(THUOC) REFERENCES THUOC(MATHUOC)
+);
+CREATE TABLE XUATTHUOC
+(
+ MADONHANG VARCHAR(10) NOT NULL,
+ THUOC VARCHAR(10) NOT NULL,
+ SOLUONG INT DEFAULT 1,
+ DONVITINH NVARCHAR(20),
+ THANHTIEN MONEY
+ PRIMARY KEY(MADONHANG, THUOC),
+ FOREIGN KEY(MADONHANG) REFERENCES DONHANGXUAT(MADONHANG),
+ FOREIGN KEY(THUOC) REFERENCES THUOC(MATHUOC)
+);
+CREATE TABLE KHOHANG
+(
+ MATHUOC VARCHAR(10) NOT NULL,
+ DONNHAP VARCHAR(10),
+ TONKHO INT DEFAULT 0,
+ NGAYHETHAN DATE,
+ PRIMARY KEY(MATHUOC, DONNHAP, TONKHO),
+ FOREIGN KEY(DONNHAP, MATHUOC) REFERENCES NHAPTHUOC(MADONHANG, THUOC)
+);
+
+
+
+
+
+INSERT INTO NHACUNGCAP (MANCC, TENNCC, DIACHI, DIENTHOAI, CONGNO)
+VALUES
+('NCC001', N'Công ty Cổ phần Traphaco', N'75 Yên Ninh, Ba Đình, Hà Nội', '18006612', 28000000),
+('NCC022', N'Công ty Cổ phần Dược phẩm ImexPharm', N'Số 4, Đường 30/4, Phường 1, TP Cao Lãnh, Đồng Tháp', '02773851941', 56000000),
+('NCC53', N'Công ty Cổ phần Dược phẩm OPC', N'1017 Hồng Bàng, Phường 12, Quận 6, TpHCM', '02838778899', 145780000),
+('NCC078', N'Công ty Cổ phần Xuất nhập khẩu Y tế DOMESCO', N'66 Quốc lộ 30, Mỹ Phú, Cao Lãnh, Đồng Tháp', '02773851270', 15670000),
+('NCC036', N'Công ty Cổ phần Dược phẩm Hà Tây', N'10A Quang Trung, Hà Đông, Hà Nội', '02433522525', 7320000);
+
+INSERT INTO NHOMTHUOC (MANHOM, TENNHOM, SOLUONG)
+VALUES
+('MN01', N'Thực phẩm chức năng', 200),
+('MN02', N'Dược mỹ phẩm', 150),
+('MN03', N'Thuốc', 3540),
+('MN04', N'Thiết bị y tế', 90);
+
+
+INSERT INTO THUOC 
+VALUES ('T00001', N'Kem bôi da Yoosun', 'MN02',N'Dịch chiết rau má, Tocopheryl acetate', 'NCC001',  27000, 30000, 25000, N'Yoosun Rau Má góp phần làm mát,làm dịu da khi bị muỗi đốt và côn trùng cắn; giúp mờ các vết sẹo'),
+('T00017', N'Kem dưỡng La Roche-Posay', 'MN02',N'Tocopheryl acetate', 'NCC078',  450000, 475000, 435000, N'La Roche-Posay Effaclar Duo (+) giảm mụn đỏ tấy trong vòng 12 giờ'),
+('T00893', N'Băng Urgo Transparent ', 'MN04',N'Polyethylene, Acrylic', 'NCC022', 16000, 19000, 13000, N'Băng cá nhân trong suốt.Gạc không dính vào vết thương, không gây đau khi thay băng.'),
+('T00004', N'Chai xịt mũi Viraleze', 'MN04',N'Purified water,Natri hydroxide,', 'NCC53',  195000, 212000, 180000,N'Bình Xịt Mũi Kháng Virus Viraleze'),
+('T00587', N'Viên uống OTiV Ecogreen', 'MN01',N'Ginkgo biloba extract', 'NCC036',  315000 ,330000 ,300000 ,N'OTiV chứa các hoạt chất sinh học quý được tinh chiết từ blueberry'),
+('T00006', N'Viên uống DHC Zinc', 'MN01',N'Chiết xuất nấm men, Kẽm Gluconat', 'NCC022',  85000 ,95000 ,70000 ,N'DHC Zinc bổ sung kẽm cho cơ thể, hỗ trợ duy trì sức khỏe, giúp cơ thể khỏe mạnh.'),
+('T00020', N'Thuốc Xương Khớp Nhất Nhất', 'MN03',N'Đỗ trọng, Cẩu tích,Đương quy', 'NCC53',  98000 ,105000 ,85000 ,N'Đây là thuốc dùng để điều trị các chứng đau lưng, đau thần kinh tọa,hỗ trợ điều trị thoái hóa'),
+('T00238', N'Viên uống Evaskin 35 Gmp', 'MN01',N'ZinC, Vitamin T', 'NCC001',  123000 ,1377000 ,990000 ,N'Evaskin 35 giúp tăng tính đàn hồi, giảm nếp nhăn trên da. Giúp cho làn da căng mịn, trẻ trung.'),
+('T05063', N'Máy đo huyết áp AND UA-611', 'MN04',NULL, 'NCC036' ,860000 ,900000 ,750000 ,N'Cảnh báo Nhịp tim không đều, bộ nhớ lưu trữ đến 30 kết quả đo,... thoải mái cho người sử dụng.');
+
+
+
+INSERT INTO NHANVIEN (MANV, TENNV, NGAYSINH, VANBANG, DIACHI, PHAI, BOPHAN, VITRI)
+VALUES
+('NV01', N'Trần Ngọc Trinh', '1996-07-25', N'Kế toán', N'18A/3/A3 Nguyễn Thị Minh Khai, Phường Đa Kao, Quận 1, TP HCM', N'Nữ',N'Kế toán viên', N'Kế toán'),
+('NV02', N'Hoàng Minh Quân', '1994-09-30', N'Trung cấp dược', N'498/30 Lê Hồng Phong, Phường 1, Quận 10, TP HCM', N'Nam', N'Dược sĩ',N'Dược sĩ' ),
+('NV03', N'Trần Hoài An', '1991-03-02', N'Thạc sĩ', N'51/6 Cao Thắng,Phường 3, Quận 3, TP HCM', N'Nam',N'Quản lý nhà thuốc', N'Dược sĩ'),
+('NV04', N'Nguyễn Nhã Hân', '1993-05-06', N'Dược sĩ', N'1088 Kha Vạn Cân, Quận Thủ Đức, TP HCM', N'Nữ',N'Kểm định thuốc', N'Dược sĩ'),
+('NV05', N'Lê Hải Đăng', '1998-06-18', N'Trung cấp dược', N'02 đường số 9, phường Tân Hưng, Quận 7, TP HCM', N'Nam',N'Quản lý kho lưu trữ', N'Kho'),
+('NV06', N'Kiều Thị Ngọc Ánh', '1997-12-21', N'Dược sĩ', N'1/73 Đường Lê Thị Hà, Xã Tân Xuân, huyện Hóc Môn, TP HCM', N'Nữ',N'Dược sĩ', N'Dược sĩ'),
+('NV07', N'Phan Thành Đạt', '1999-10-10', N'Cao đẳng dược', N'262 QL22, Tân Thông Hội, Củ Chi, TP HCM', N'Nam', N'Quản lý xuất thuốc',N'Kho'),
+('NV08', N'Phạm Thuỳ Anh', '1992-08-05', N'Kế toán', N'27 Thảo Điền, Phường Thảo Điền, Quận 2, TP  HCM.', N'Nữ', N'Thu ngân',N'Kế toán'),
+('NV09', N'Lâm Bảo Khánh', '1999-04-07', N'Trung cấp dược', N'73 Đường Ung Văn Khiêm, Phường 25, quận Bình Thạnh, TP HCM', N'Nam', N'Quản lý nhập thuốc',N'Kho'),
+('NV10', N'Nguyễn Thị Ngọc Phụng', '1998-01-05', N'Dược sĩ', N'214 Đường Nguyễn Trãi, Phường 3, Quận 5, TP HCM', N'Nữ', N'Dược sĩ', N'Dược sĩ');
+
+
+INSERT INTO KHACHHANG (MAKH, TENKHACH, DIACHI, DIENTHOAI, LOAIKH, CONGNO)
+VALUES
+('KH01', N'Đặng Văn Hào', N'125 Võ Thị Sáu, Phường 2, Thành phố Vũng Tàu, Bà Rịa - Vũng Tàu', '0886001962', N'Sỉ', 0),
+('KH02', N'Bùi Gia Hưng', N'256A Ấp Bắc, TP Mỹ Tho, Tiền Giang', '078294242', N'Sỉ', 2500000),
+('KH03', N'Trần Uyên Vy', N'1/29 Hoàng Diệu, phường 6, thành phố Đà Lạt, Lâm Đồng', '0911255312', N'Lẻ', 145000),
+('KH04', N'Nguyễn Hải Yến', N'3/225B tỉnh lộ 38, phường 5, thành phố Bạc Liêu', '0378949234', N'Sỉ', 670000),
+('KH05', N'Ngô Quang Lộc', N'số 2 Trương Định, TP Huế', '0981967874', N'Lẻ', 0),
+('KH06', N'Lý Ngọc Tâm', N'Số 19, ngõ 85 Đường Xuân Thuỷ, Quận Cầu Giấy, Hà Nội', '0934428932', N'Sỉ', 10365000);
+
+
+INSERT INTO DONHANGXUAT (MADONHANG, MAKH, MANV, NGAYLAP, TONGTIEN, DATHANHTOAN, CONGNO)
+VALUES
+('DHX0001', 'KH01', 'NV03', '2022-07-23', 2367000, 2000000, 367000),
+('DHX0002', 'KH02', 'NV01', '2023-04-14', 780000, 780000, 0),
+('DHX0003', 'KH03', 'NV10', '2023-01-21', 450000, 200000, 250000),
+('DHX0004', 'KH04', 'NV06', '2021-11-02', 965000, 600000, 365000),
+('DHX0005', 'KH05', 'NV04', '2022-12-28', 10650000, 10000000, 650000),
+('DHX0006', 'KH06', 'NV08', '2022-03-09', 634000, 634000, 0);
+
+INSERT INTO DONHANGNHAP (MADONHANG, MANCC, NGAYLAP, TONGTIEN, DATHANHTOAN, CONGNO)
+VALUES
+('DHN001', 'NCC001', '2023-05-30', 23540000, 1554000, 8000000),
+('DHN082', 'NCC022', '2022-08-07', 8670000, 8670000, 0),
+('DHN034', 'NCC53', '2022-11-20', 98350000, 95000000, 3350000),
+('DHN156', 'NCC078', '2021-02-07', 27870000, 27870000, 0),
+('DHN743', 'NCC036', '2023-03-24', 57250000, 50000000, 7250000);
+
+
+INSERT INTO NHAPTHUOC (MADONHANG, THUOC, SOLUONG, DONVITINH, THANHTIEN, NGAYSX, NGAYHETHAN)
+VALUES
+('DHN001', 'T00001', 300, N'Tuýp', 7500000, '2023-01-04', '2024-01-04'),
+('DHN082', 'T00893', 7000, N'Viên', 6300000, '2022-06-07', '2024-06-07'),
+('DHN034','T00238', 70, N'Hộp', 69300000, '2022-05-11', '2025-05-11'),
+('DHN156', 'T00017', 30, N'Tuýp', 13050000, '2021-01-05', '2024-01-05'),
+('DHN743', 'T00004', 120, N'Chai', 21600000, '2023-02-07', '2026-02-07');
+ 
+
+INSERT INTO XUATTHUOC (MADONHANG, THUOC, SOLUONG, DONVITINH, THANHTIEN)
+VALUES
+('DHX0001', 'T00001', 280, N'Tuýp', 7000000),
+('DHX0002', 'T00893', 6700, N'Viên', 6030000),
+('DHX0003','T00238', 65, N'Hộp', 64350000),
+('DHX0005', 'T00017', 30, N'Tuýp', 13050000),
+('DHX0006', 'T00004', 110, N'Chai', 19800000);
+
+
+INSERT INTO KHOHANG (MATHUOC, DONNHAP, TONKHO, NGAYHETHAN)
+VALUES
+('T00001', 'DHN001', 20, '2024-01-04'),
+('T00893', 'DHN082', 300, '2024-06-07'),
+('T00238', 'DHN034', 5, '2025-05-11'),
+('T00017', 'DHN156', 0, '2024-01-05'),
+('T00004', 'DHN743', 10, '2026-02-07');
+
+
+
+
+select * from THUOC
+select * from NHOMTHUOC
+select * from XUATTHUOC
+select * from KHOHANG
+select * from DONHANGNHAP
+select * from DONHANGXUAT
+select * from KHACHHANG
+select * from NHACUNGCAP
+select * from NHANVIEN
+select * from NHAPTHUOC
